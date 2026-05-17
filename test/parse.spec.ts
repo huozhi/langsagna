@@ -7,7 +7,7 @@ describe('parser', () => {
     const {
       constants: { Directive },
       VM,
-    } = compile(readFile('../fixture/expression'))
+    } = compile(readFile('../examples/expression'))
 
     expect(VM.directives()).toEqual([
       Directive.JMP,
@@ -58,8 +58,23 @@ describe('parser', () => {
       Directive.CONST,
       2,
       Directive.ADD,
+      Directive.PUSH,
       Directive.PRINT,
+      1,
     ])
+  })
+
+  it('emits print directives for multiple arguments', () => {
+    const {
+      constants: { Directive },
+      VM,
+    } = compile('print("result =", 2);')
+
+    const directives = VM.directives()
+
+    expect(directives).toContain(Directive.PRINT)
+    expect(directives.at(-1)).toBe(2)
+    expect(directives.at(-2)).toBe(Directive.PRINT)
   })
 
   it('emits an assert directive for expression arguments', () => {
@@ -89,7 +104,7 @@ describe('parser', () => {
     const {
       constants: { Directive },
       VM,
-    } = compile('now = clock(); value = load("fixture/assignment");')
+    } = compile('now = clock(); value = load("examples/assignment");')
 
     expect(VM.directives()).toEqual([
       Directive.JMP,
@@ -98,7 +113,7 @@ describe('parser', () => {
       Directive.STORE,
       'now',
       Directive.CONST,
-      'fixture/assignment',
+      'examples/assignment',
       Directive.FILE,
       Directive.STORE,
       'value',
@@ -109,7 +124,7 @@ describe('parser', () => {
     const {
       constants: { Directive },
       VM,
-    } = compile(readFile('../fixture/weighted-loop'))
+    } = compile(readFile('../examples/weighted-loop'))
 
     const directives = VM.directives()
 
@@ -164,7 +179,7 @@ result;`)
     const {
       constants: { Directive },
       VM,
-    } = compile(readFile('../fixture/weighted-loop'))
+    } = compile(readFile('../examples/weighted-loop'))
 
     const trace = VM.trace()
 

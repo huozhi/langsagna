@@ -10,7 +10,7 @@ export const Directive = {
   MUL:    'MUL',     // ax = value stack pop * ax
   DIV:    'DIV',     // ax = value stack pop / ax
   LT:     'LT',      // ax = value stack pop < ax ? 1 : 0
-  PRINT:  'PRINT',   // print ax
+  PRINT:  'PRINT',   // print argc operands from the value stack
   ASSERT: 'ASSERT',  // throw unless ax is truthy
   CLOCK:  'CLOCK',   // ax = Date.now()
   FILE:   'FILE',    // ax = file content at path in ax

@@ -5,7 +5,7 @@ import { readFile } from './utils.ts'
 
 describe('language execution', () => {
   it('executes the assignment fixture', () => {
-    const { Store, VM } = compile(readFile('../fixture/assignment'))
+    const { Store, VM } = compile(readFile('../examples/assignment'))
 
     VM.execute()
 
@@ -15,7 +15,7 @@ describe('language execution', () => {
   })
 
   it('executes the loop fixture', () => {
-    const { Store, VM } = compile(readFile('../fixture/loop'))
+    const { Store, VM } = compile(readFile('../examples/loop'))
 
     VM.execute()
 
@@ -25,7 +25,7 @@ describe('language execution', () => {
   })
 
   it('executes the complex expression fixture', () => {
-    const { Store, VM } = compile(readFile('../fixture/complex-expression'))
+    const { Store, VM } = compile(readFile('../examples/complex-expression'))
 
     VM.execute()
 
@@ -35,7 +35,7 @@ describe('language execution', () => {
   })
 
   it('executes the weighted loop fixture', () => {
-    const { Store, VM } = compile(readFile('../fixture/weighted-loop'))
+    const { Store, VM } = compile(readFile('../examples/weighted-loop'))
 
     VM.execute()
 
@@ -50,7 +50,7 @@ describe('language execution', () => {
     console.log = (...values: unknown[]) => { logs.push(values) }
 
     try {
-      const { Store, VM } = compile(readFile('../fixture/print-flow'))
+      const { Store, VM } = compile(readFile('../examples/print-flow'))
 
       VM.execute()
 
@@ -64,7 +64,7 @@ describe('language execution', () => {
   })
 
   it('executes the function call fixture', () => {
-    const { Store, VM } = compile(readFile('../fixture/function-call'))
+    const { Store, VM } = compile(readFile('../examples/function-call'))
 
     VM.execute()
 
@@ -78,7 +78,7 @@ describe('language execution', () => {
     console.log = (...values: unknown[]) => { logs.push(values) }
 
     try {
-      const { Store, VM } = compile(readFile('../fixture/load-file'))
+      const { Store, VM } = compile(readFile('../examples/load-file'))
 
       VM.execute()
 
@@ -90,8 +90,17 @@ describe('language execution', () => {
     }
   })
 
-  it('executes the assertions fixture until the failed assertion', () => {
-    const { VM } = compile(readFile('../fixture/assertions'))
+  it('executes the if else example', () => {
+    const { Store, VM } = compile(readFile('../examples/if-else'))
+
+    VM.execute()
+
+    expect(Store.ax).toBe(2)
+    expect(Store.env.get('result')).toBe(2)
+  })
+
+  it('executes the assertions example until the failed assertion', () => {
+    const { VM } = compile(readFile('../examples/assertions'))
 
     expect(() => VM.execute()).toThrow('RUNTIME ERR: assert failed')
   })
@@ -136,6 +145,20 @@ add(1);`)).toThrow('RUNTIME ERR: add expected 2 args but got 1')
     expect(result).toBe(3)
   })
 
+  it('prints multiple arguments', () => {
+    const logs: unknown[][] = []
+    const originalLog = console.log
+    console.log = (...values: unknown[]) => { logs.push(values) }
+
+    try {
+      execute('result = 2; print("result =", result);')
+
+      expect(logs).toEqual([['result =', 2]])
+    } finally {
+      console.log = originalLog
+    }
+  })
+
   it('prints a value and returns it from execute', () => {
     const logs: unknown[][] = []
     const originalLog = console.log
@@ -167,7 +190,7 @@ add(1);`)).toThrow('RUNTIME ERR: add expected 2 args but got 1')
   })
 
   it('executes load system calls', () => {
-    expect(execute('load("fixture/assignment");')).toBe('a = 1;\nb = 2 + a;')
+    expect(execute('load("examples/assignment");')).toBe('a = 1;\nb = 2 + a;')
   })
 
   it('rejects failed assertions', () => {

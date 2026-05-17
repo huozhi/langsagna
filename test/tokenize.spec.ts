@@ -70,7 +70,7 @@ describe('tokenizer', () => {
       TokenState,
     } = runtime('')
 
-    Source.initialize('load("fixture/assignment")')
+    Source.initialize('load("examples/assignment")')
 
     next()
     expect(TokenState.token).toBe(TokenKind.Identifier)
@@ -81,6 +81,6 @@ describe('tokenizer', () => {
 
     next()
     expect(TokenState.token).toBe(TokenKind.String)
-    expect(TokenState.value).toBe('fixture/assignment')
+    expect(TokenState.value).toBe('examples/assignment')
   })
 })

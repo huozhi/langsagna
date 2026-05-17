@@ -3,35 +3,66 @@
 
 ## About
 
-Thanks for cool practice of [c4](https://github.com/rswier/c4) and awesome explaination in [write a c interpreter](https://github.com/lotabout/write-a-C-interpreter). Still work in progress.
+Thanks for cool practice of [c4](https://github.com/rswier/c4) and awesome explaination in [write a C interpreter](https://github.com/lotabout/write-a-C-interpreter). Still work in progress.
 
 ## Play
 
-run the Bun test suite
+Run the Bun test suite:
 
 ```
 bun run test
 ```
 
-Visualize directive execution for the supported fixtures:
+Run the default examples:
 
 ```
-bun run trace
+bun run exec
 ```
 
-Trace a specific file:
+Run one example:
 
 ```
-bun run trace fixture/assignment
+bun run exec examples/assignment
+```
+
+Show directive traces:
+
+```
+bun run exec -- --trace examples/assignment
 ```
 
 Step through execution interactively:
 
 ```
-bun run trace -- --step fixture/loop
+bun run exec -- --step examples/loop
 ```
 
 Use Enter or `n` for next, `p` for previous, and `q` to quit.
+
+## Examples
+
+Programs live in `examples/`.
+
+| Example | Command | What it shows |
+| --- | --- | --- |
+| `assignment` | `bun run exec examples/assignment` | variables and arithmetic |
+| `loop` | `bun run exec examples/loop` | `while` loops |
+| `if-else` | `bun run exec examples/if-else` | `if` / `else` branches |
+| `function-call` | `bun run exec examples/function-call` | nested function calls and `print` |
+| `print-flow` | `bun run exec examples/print-flow` | `print()` system call |
+| `load-file` | `bun run exec examples/load-file` | `load(path)` reads a file and prints it |
+| `expression` | `bun run exec examples/expression` | operator precedence |
+| `complex-expression` | `bun run exec examples/complex-expression` | grouped expressions |
+| `weighted-loop` | `bun run exec examples/weighted-loop` | loop with multiplication |
+| `assertions` | `bun run exec examples/assertions` | `assert(expr)`; fails on the last check |
+
+Trace a specific example:
+
+```
+bun run exec -- --trace examples/function-call
+```
+
+## API
 
 Use the package entry API:
 

@@ -206,12 +206,8 @@ function expr(level = 0) {
     next() // Ident
     if ((TokenState.token as string | number | null) === '(') {
       if (ident === 'print') {
-        expect('(')
-        next()
-        expr(TokenKind.Assign)
-        expect(')')
-        next()
-        emit(Directive.PRINT)
+        const argc = argList()
+        emit(Directive.PRINT, argc)
       } else if (ident === 'assert') {
         expect('(')
         next()

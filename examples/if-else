@@ -1,0 +1,7 @@
+value = 0;
+if (value) {
+  result = 1;
+} else {
+  result = 2;
+}
+print('result =', result);

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "bun test",
-    "trace": "bun scripts/trace.ts",
+    "exec": "bun scripts/exec.ts",
     "web:build": "next build web",
     "web:dev": "next dev web"
   },

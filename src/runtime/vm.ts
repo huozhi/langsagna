@@ -28,6 +28,7 @@ const directiveOperands: Partial<Record<DirectiveName, number>> = {
   [Directive.JMP]: 1,
   [Directive.BZ]: 1,
   [Directive.CALL]: 2,
+  [Directive.PRINT]: 1,
 }
 
 function numberValue(value: RuntimeValue) {
@@ -111,19 +112,34 @@ function execute(text: DirectiveItem[], shouldTrace: boolean) {
     else if (op === Directive.MUL) { Store.ax = popNumber() * numberValue(Store.ax) }
     else if (op === Directive.DIV) { Store.ax = popNumber() / numberValue(Store.ax) }
     else if (op === Directive.LT) { Store.ax = popNumber() < numberValue(Store.ax) ? 1 : 0 }
-    else if (op === Directive.PRINT) { console.log(Store.ax) }
+    else if (op === Directive.PRINT) {
+      const argc = Number(text[Store.pc++])
+      if (argc > 0) {
+        const args = Store.vs.splice(-argc, argc)
+        console.log(...args)
+      } else {
+        console.log()
+      }
+    }
     else if (op === Directive.ASSERT) {
-      if (!Store.ax) error('RUNTIME', 'assert failed')
+      if (!Store.ax) error('RUNTIME', 'assert failed', directiveLines.get(pc) ?? null)
     }
     else if (op === Directive.CLOCK) { Store.ax = Date.now() }
-    else if (op === Directive.FILE) { Store.ax = readFileSync(String(Store.ax), 'utf8') }
+    else if (op === Directive.FILE) {
+      const filename = String(Store.ax)
+      try {
+        Store.ax = readFileSync(filename, 'utf8')
+      } catch {
+        error('RUNTIME', `cannot load ${filename}`, directiveLines.get(pc) ?? null)
+      }
+    }
     else if (op === Directive.CALL) {
       // CALL stores two operands after the directive: function name and arg count.
       const name = String(text[Store.pc++])
       const argc = Number(text[Store.pc++])
-      const fn = Store.fns.get(name) ?? error('RUNTIME', `unknown function ${name}`)
+      const fn = Store.fns.get(name) ?? error('RUNTIME', `unknown function ${name}`, directiveLines.get(pc) ?? null)
       if (argc !== fn.params.length) {
-        error('RUNTIME', `${name} expected ${fn.params.length} args but got ${argc}`)
+        error('RUNTIME', `${name} expected ${fn.params.length} args but got ${argc}`, directiveLines.get(pc) ?? null)
       }
 
       // Args were pushed left-to-right, so pop them right-to-left into params.
@@ -139,7 +155,7 @@ function execute(text: DirectiveItem[], shouldTrace: boolean) {
       Store.pc = fn.entry
     }
     else if (op === Directive.RET) {
-      const frame = Store.cs.pop() ?? error('RUNTIME', 'RET without call frame')
+      const frame = Store.cs.pop() ?? error('RUNTIME', 'RET without call frame', directiveLines.get(pc) ?? null)
       Store.pc = frame.ret
     }
     else if (op === Directive.EXIT) {

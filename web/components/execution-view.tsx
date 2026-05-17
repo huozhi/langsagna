@@ -91,7 +91,7 @@ function directiveText(step: VmTraceStep) {
 }
 
 function directiveHasOperand(item: DirectiveItem) {
-  return item === 'CONST' || item === 'LOAD' || item === 'STORE' || item === 'JMP' || item === 'BZ' || item === 'CALL'
+  return item === 'CONST' || item === 'LOAD' || item === 'STORE' || item === 'JMP' || item === 'BZ' || item === 'CALL' || item === 'PRINT'
 }
 
 type SourceRow = {

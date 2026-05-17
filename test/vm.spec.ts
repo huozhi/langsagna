@@ -101,7 +101,7 @@ describe('vm', () => {
 
     VM.emitAll([
       Directive.CONST,
-      'fixture/assignment',
+      'examples/assignment',
       Directive.FILE,
       Directive.EXIT,
     ])
