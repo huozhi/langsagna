@@ -50,7 +50,10 @@ export function next() {
     else if (ch === '/') { setToken(TokenKind.Divide); return TokenState }
     else if (ch === '=') { setToken(TokenKind.Assign); return TokenState }
     else if (ch === '<') { setToken(TokenKind.LessThan); return TokenState }
-    else if (ch === '(' || ch === ')' || ch === '{' || ch === '}' || ch === ';') { setToken(ch); return TokenState }
+    else if (ch === '(' || ch === ')' || ch === '{' || ch === '}' || ch === ';' || ch === ',') {
+      setToken(ch)
+      return TokenState
+    }
   }
 
   return TokenState

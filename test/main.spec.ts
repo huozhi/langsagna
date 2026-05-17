@@ -63,6 +63,24 @@ describe('language execution', () => {
     }
   })
 
+  it('executes the function call fixture', () => {
+    const { Store, VM } = compile(readFile('../fixture/function-call'))
+
+    VM.execute()
+
+    expect(Store.ax).toBe(11)
+    expect(Store.env.get('result')).toBe(11)
+  })
+
+  it('executes a function call through the public API', () => {
+    const result = execute(`fn add(a, b) {
+  return a + b;
+}
+add(1, 2);`)
+
+    expect(result).toBe(3)
+  })
+
   it('exposes a single public execute API', () => {
     const result = execute('a = 1; b = a + 2; b;')
 

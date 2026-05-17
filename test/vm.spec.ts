@@ -52,6 +52,49 @@ describe('vm', () => {
     expect(trace.at(-1)?.after.vs).toEqual([])
   })
 
+  it('executes call and return directives', () => {
+    const {
+      constants: { Directive },
+      Store,
+      VM,
+    } = runtime('')
+
+    VM.emit(Directive.JMP)
+    const mainTarget = VM.position()
+    VM.emit(null)
+
+    // This test bypasses the parser: registerFn defines the function
+    // metadata, and CALL binds the pushed arguments to the frame locals a/b.
+    VM.registerFn('add', ['a', 'b'], VM.position())
+    VM.emitAll([
+      Directive.LOAD,
+      'a',
+      Directive.PUSH,
+      Directive.LOAD,
+      'b',
+      Directive.ADD,
+      Directive.RET,
+    ])
+
+    VM.patch(mainTarget, VM.position())
+    VM.emitAll([
+      Directive.CONST,
+      1,
+      Directive.PUSH,
+      Directive.CONST,
+      2,
+      Directive.PUSH,
+      Directive.CALL,
+      'add',
+      2,
+      Directive.EXIT,
+    ])
+    VM.execute()
+
+    expect(Store.ax).toBe(3)
+    expect(Store.cs).toEqual([])
+  })
+
   it('executes branch and jump directives', () => {
     const {
       constants: { Directive },

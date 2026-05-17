@@ -10,6 +10,8 @@ describe('parser', () => {
     } = compile(readFile('../fixture/expression'))
 
     expect(VM.directives()).toEqual([
+      Directive.JMP,
+      2,
       Directive.CONST,
       2,
       Directive.PUSH,
@@ -30,6 +32,8 @@ describe('parser', () => {
     } = compile('a = 1; a;')
 
     expect(VM.directives()).toEqual([
+      Directive.JMP,
+      2,
       Directive.CONST,
       1,
       Directive.STORE,
@@ -46,6 +50,8 @@ describe('parser', () => {
     } = compile('print(1 + 2);')
 
     expect(VM.directives()).toEqual([
+      Directive.JMP,
+      2,
       Directive.CONST,
       1,
       Directive.PUSH,
@@ -72,6 +78,24 @@ describe('parser', () => {
     expect(directives.at(-1)).toBe(Directive.ADD)
   })
 
+  it('emits call and return directives for functions', () => {
+    const {
+      constants: { Directive },
+      VM,
+    } = compile(`fn add(a, b) {
+  return a + b;
+}
+result = add(1, 2);
+result;`)
+
+    const directives = VM.directives()
+
+    expect(directives[0]).toBe(Directive.JMP)
+    expect(directives).toContain(Directive.RET)
+    expect(directives).toContain(Directive.CALL)
+    expect(directives).toContain('add')
+  })
+
   it('records source lines for trace steps', () => {
     const {
       constants: { Directive },
@@ -80,7 +104,7 @@ describe('parser', () => {
 
     const trace = VM.trace()
 
-    expect(trace[0].sourceLine).toBe(1)
+    expect(trace.find(step => step.op === Directive.CONST)?.sourceLine).toBe(1)
     expect(trace.find(step => step.op === Directive.BZ)?.sourceLine).toBe(3)
     expect(trace.find(step => step.op === Directive.MUL)?.sourceLine).toBe(4)
   })

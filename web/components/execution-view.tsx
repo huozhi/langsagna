@@ -38,6 +38,24 @@ b;`,
 offset = (base - 5) * (1 + 2);
 offset + base;`,
   },
+  {
+    name: 'function call',
+    code: `fn add(a, b) {
+  return a + b;
+}
+
+fn double(value) {
+  return add(value, value);
+}
+
+fn mix(x, y, z) {
+  return add(double(x), add(y, z));
+}
+
+result = mix(2, 3, 4);
+print(result);
+result;`,
+  },
 ]
 
 function valueText(value: RuntimeValue) {
@@ -73,7 +91,7 @@ function directiveText(step: VmTraceStep) {
 }
 
 function directiveHasOperand(item: DirectiveItem) {
-  return item === 'CONST' || item === 'LOAD' || item === 'STORE' || item === 'JMP' || item === 'BZ'
+  return item === 'CONST' || item === 'LOAD' || item === 'STORE' || item === 'JMP' || item === 'BZ' || item === 'CALL'
 }
 
 type SourceRow = {

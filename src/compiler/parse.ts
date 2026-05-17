@@ -4,8 +4,7 @@ import { TokenKind } from '../lexer/token-kind.ts'
 import { next } from '../lexer/tokenize.ts'
 import { Directive } from '../runtime/directive.ts'
 import { VM } from '../runtime/vm.ts'
-
-const error = (message: string) => { throw new Error('PARSE ERR: ' + message) }
+import { error } from '../error.ts'
 
 function emit(...items: Parameters<typeof VM.emit>) {
   VM.mark(Source.line)
@@ -15,21 +14,97 @@ function emit(...items: Parameters<typeof VM.emit>) {
 function consume(expected: string | number) {
   if (TokenState.token !== expected) {
     const actual = typeof TokenState.token === 'number' ? TokenKind.label(TokenState.token) : TokenState.token
-    error(`expected ${expected} but get ${actual}`)
+    error('PARSE', `expected ${expected} but get ${actual}`)
   }
 
   next()
 }
 
+function token() {
+  return TokenState.token
+}
+
 // expr: NUMBER
 // | OP expr
 // | ( expr )
+// | ident
+// | ident '(' [expr [',' expr]*] ')'
 // block      : '{' {statement ';'} '}'
 // statement  : 'if' expr block ['else' block]
 //            | 'while' expr block
+//            | 'return' [expr]
+//            | 'fn' ident '(' [ident [',' ident]*] ')' block
 //            | expr
 //            | ident = expr
 // program    : [statement ';']
+
+function param() {
+  if (TokenState.token !== TokenKind.Identifier) error('PARSE', 'expected parameter name')
+  const name = String(TokenState.value)
+  next()
+  return name
+}
+
+function paramList() {
+  const params: string[] = []
+
+  consume('(')
+  if (TokenState.token !== ')') {
+    params.push(param())
+
+    while (TokenState.token === ',') {
+      next()
+      params.push(param())
+    }
+  }
+  consume(')')
+
+  return params
+}
+
+function argList() {
+  let argc = 0
+
+  consume('(')
+  if (TokenState.token !== ')') {
+    expr(TokenKind.Assign)
+    argc += 1
+
+    while (TokenState.token === ',') {
+      next()
+      emit(Directive.PUSH)
+      expr(TokenKind.Assign)
+      argc += 1
+    }
+  }
+  consume(')')
+
+  if (argc > 0) {
+    emit(Directive.PUSH)
+  }
+
+  return argc
+}
+
+function fnDecl() {
+  consume(TokenKind.Function)
+  if (TokenState.token !== TokenKind.Identifier) error('PARSE', 'expected function name')
+  const name = String(TokenState.value)
+  next()
+
+  const params = paramList()
+
+  emit(Directive.JMP)
+  const skipTarget = VM.position()
+  emit(null)
+
+  const fnStart = VM.position()
+  VM.registerFn(name, params, fnStart)
+
+  block()
+
+  VM.patch(skipTarget, VM.position())
+}
 
 function statement() {
   if (!TokenState.token && !Source.eof()) next()
@@ -46,13 +121,20 @@ function statement() {
     block()
     emit(Directive.JMP, loopStart)
     VM.patch(exitTarget, VM.position())
+  } else if (TokenState.token === TokenKind.Return) {
+    next()
+    if (token() !== ';' && token() !== '}') {
+      expr(TokenKind.Assign)
+    }
+    emit(Directive.RET)
+    if (token() === ';') { next() }
   } else if (TokenState.token === '{') {
     block()
   } else if (TokenState.token === ';') {
     next() // // empty statement
   } else {
     expr(TokenKind.Assign)
-    if (TokenState.token === ';') { next() } else { error(`expected ; but get ${TokenKind.label(TokenState.token as number)}`) }
+    if (TokenState.token === ';') { next() } else { error('PARSE', `expected ; but get ${TokenKind.label(TokenState.token as number)}`) }
   }
 }
 
@@ -79,12 +161,15 @@ function expr(level = 0) {
     const ident = String(TokenState.value)
     next() // Ident
     if ((TokenState.token as string | number | null) === '(') {
-      if (ident !== 'print') error(`unsupported call ${ident}`)
-
-      consume('(')
-      expr(TokenKind.Assign)
-      consume(')')
-      emit(Directive.PRINT)
+      if (ident === 'print') {
+        consume('(')
+        expr(TokenKind.Assign)
+        consume(')')
+        emit(Directive.PRINT)
+      } else {
+        const argc = argList()
+        emit(Directive.CALL, ident, argc)
+      }
     } else {
       emit(Directive.LOAD, ident)
     }
@@ -105,18 +190,33 @@ function expr(level = 0) {
       const target = VM.pop()
       const load = VM.pop()
       if (load !== Directive.LOAD || typeof target !== 'string') {
-        error('bad lvalue in assignment')
+        error('PARSE', 'bad lvalue in assignment')
       }
       expr(TokenKind.Assign)
       emit(Directive.STORE, target)
     }
 
-    else { error('parsing fail ' + TokenState.token) }
+    else { error('PARSE', 'parsing fail ' + TokenState.token) }
   }
 }
 
 export function parse() {
+  emit(Directive.JMP)
+  const mainTarget = VM.position()
+  emit(null)
+
+  let mainStart: number | null = null
+
   while (!Source.eof()) {
-    statement()
+    if (!TokenState.token) next()
+    if (TokenState.token === TokenKind.Function) {
+      fnDecl()
+    } else {
+      if (mainStart === null) mainStart = VM.position()
+      statement()
+    }
   }
+
+  if (mainStart === null) mainStart = VM.position()
+  VM.patch(mainTarget, mainStart)
 }

@@ -29,7 +29,7 @@ function renderDirectives(directives: readonly DirectiveItem[], activePc: number
     const op = directives[i]
     const marker = pc === activePc ? '->' : '  '
 
-    if (op === 'CONST' || op === 'LOAD' || op === 'STORE' || op === 'JMP' || op === 'BZ') {
+    if (op === 'CONST' || op === 'LOAD' || op === 'STORE' || op === 'JMP' || op === 'BZ' || op === 'CALL') {
       lines.push(`${marker} ${String(pc).padStart(2, '0')}: ${op} ${directives[++i]}`)
     } else {
       lines.push(`${marker} ${String(pc).padStart(2, '0')}: ${op}`)

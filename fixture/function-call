@@ -1,0 +1,15 @@
+fn add(a, b) {
+  return a + b;
+}
+
+fn double(value) {
+  return add(value, value);
+}
+
+fn mix(x, y, z) {
+  return add(double(x), add(y, z));
+}
+
+result = mix(2, 3, 4);
+print(result);
+result;
