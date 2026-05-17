@@ -218,13 +218,6 @@ function expr(level = 0) {
       } else if (ident === 'clock') {
         emptyArgList()
         emit(Directive.CLOCK)
-      } else if (ident === 'load') {
-        expect('(')
-        next()
-        expr(TokenKind.Assign)
-        expect(')')
-        next()
-        emit(Directive.FILE)
       } else {
         const argc = argList()
         emit(Directive.CALL, ident, argc)

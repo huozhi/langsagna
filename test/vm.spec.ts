@@ -92,24 +92,6 @@ describe('vm', () => {
     }
   })
 
-  it('executes file directives', () => {
-    const {
-      constants: { Directive },
-      Store,
-      VM,
-    } = runtime('')
-
-    VM.emitAll([
-      Directive.CONST,
-      'examples/assignment',
-      Directive.FILE,
-      Directive.EXIT,
-    ])
-    VM.execute()
-
-    expect(Store.ax).toBe('a = 1;\nb = 2 + a;')
-  })
-
   it('throws when assert receives a falsy value', () => {
     const {
       constants: { Directive },

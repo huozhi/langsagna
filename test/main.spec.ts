@@ -72,24 +72,6 @@ describe('language execution', () => {
     expect(Store.env.get('result')).toBe(11)
   })
 
-  it('executes the load file fixture', () => {
-    const logs: unknown[][] = []
-    const originalLog = console.log
-    console.log = (...values: unknown[]) => { logs.push(values) }
-
-    try {
-      const { Store, VM } = compile(readFile('../examples/load-file'))
-
-      VM.execute()
-
-      expect(Store.ax).toBe('a = 1;\nb = 2 + a;')
-      expect(Store.env.get('content')).toBe('a = 1;\nb = 2 + a;')
-      expect(logs).toEqual([['a = 1;\nb = 2 + a;']])
-    } finally {
-      console.log = originalLog
-    }
-  })
-
   it('executes the if else example', () => {
     const { Store, VM } = compile(readFile('../examples/if-else'))
 
@@ -187,10 +169,6 @@ add(1);`)).toThrow('RUNTIME ERR: add expected 2 args but got 1')
     } finally {
       Date.now = now
     }
-  })
-
-  it('executes load system calls', () => {
-    expect(execute('load("examples/assignment");')).toBe('a = 1;\nb = 2 + a;')
   })
 
   it('rejects failed assertions', () => {

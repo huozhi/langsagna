@@ -70,17 +70,17 @@ describe('tokenizer', () => {
       TokenState,
     } = runtime('')
 
-    Source.initialize('load("examples/assignment")')
+    Source.initialize('print("hello")')
 
     next()
     expect(TokenState.token).toBe(TokenKind.Identifier)
-    expect(TokenState.value).toBe('load')
+    expect(TokenState.value).toBe('print')
 
     next()
     expect(TokenState.token).toBe('(')
 
     next()
     expect(TokenState.token).toBe(TokenKind.String)
-    expect(TokenState.value).toBe('examples/assignment')
+    expect(TokenState.value).toBe('hello')
   })
 })

@@ -100,11 +100,11 @@ describe('parser', () => {
     ])
   })
 
-  it('emits directives for clock and load system calls', () => {
+  it('emits directives for clock system calls', () => {
     const {
       constants: { Directive },
       VM,
-    } = compile('now = clock(); value = load("examples/assignment");')
+    } = compile('now = clock();')
 
     expect(VM.directives()).toEqual([
       Directive.JMP,
@@ -112,11 +112,6 @@ describe('parser', () => {
       Directive.CLOCK,
       Directive.STORE,
       'now',
-      Directive.CONST,
-      'examples/assignment',
-      Directive.FILE,
-      Directive.STORE,
-      'value',
     ])
   })
 

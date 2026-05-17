@@ -1,7 +1,6 @@
 import { Directive, type DirectiveName } from './directive.ts'
 import { Store, type RuntimeValue } from './storage.ts'
 import { error } from '../error.ts'
-import { readFileSync } from 'node:fs'
 
 export type DirectiveItem = DirectiveName | RuntimeValue
 
@@ -125,14 +124,6 @@ function execute(text: DirectiveItem[], shouldTrace: boolean) {
       if (!Store.ax) error('RUNTIME', 'assert failed', directiveLines.get(pc) ?? null)
     }
     else if (op === Directive.CLOCK) { Store.ax = Date.now() }
-    else if (op === Directive.FILE) {
-      const filename = String(Store.ax)
-      try {
-        Store.ax = readFileSync(filename, 'utf8')
-      } catch {
-        error('RUNTIME', `cannot load ${filename}`, directiveLines.get(pc) ?? null)
-      }
-    }
     else if (op === Directive.CALL) {
       // CALL stores two operands after the directive: function name and arg count.
       const name = String(text[Store.pc++])

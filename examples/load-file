@@ -1,3 +1,0 @@
-content = load("examples/assignment");
-print(content);
-content;

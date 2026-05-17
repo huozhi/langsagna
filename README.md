@@ -45,7 +45,6 @@ Not supported yet: string `+`, `==`, arrays, comments, forward references.
 | `print(...)` | zero or more expressions | prints to stdout, leaves last arg in `ax` |
 | `assert(expr)` | one expression | throws if falsy |
 | `clock()` | none | `Date.now()` |
-| `load(path)` | path expression (string) | file contents as string |
 
 Functions must be declared before use. Calls check arity (`add(1)` is an error).
 
@@ -118,20 +117,6 @@ add(1, 2);
 
 ```
 → 3
-```
-
-</details>
-
-<details>
-<summary>Load a file</summary>
-
-```js
-load("examples/assignment");
-```
-
-```
-→ a = 1;
-b = 2 + a;
 ```
 
 </details>

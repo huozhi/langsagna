@@ -13,7 +13,6 @@ export const Directive = {
   PRINT:  'PRINT',   // print argc operands from the value stack
   ASSERT: 'ASSERT',  // throw unless ax is truthy
   CLOCK:  'CLOCK',   // ax = Date.now()
-  FILE:   'FILE',    // ax = file content at path in ax
   CALL:   'CALL',    // call function operand with argc operand
   RET:    'RET',     // return to current call frame ret
   EXIT:   'EXIT',    // stop execution
