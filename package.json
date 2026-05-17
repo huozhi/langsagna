@@ -11,7 +11,8 @@
     "test": "bun test",
     "exec": "bun scripts/exec.ts",
     "web:build": "next build web",
-    "web:dev": "next dev web"
+    "web:dev": "next dev web",
+    "web:start": "next start web"
   },
   "packageManager": "bun@1.3.13",
   "repository": {
